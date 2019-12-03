@@ -1,0 +1,39 @@
+BDCS, Unicum, March 24, 2019
+
+Discussing assignment 2: ER and UML
+
+Intro
+---
+Recalling that our most recent work, the project prospectus for the Web Service `Weather Dress`, discussed the general functionality and the scope of such a service, this assignment pursues with the development of the database module by designing the Entity Relation(ER) diagram and defining the Logical Database Schema. 
+
+As specified in the previous work, the main idea of `Weather Dress` is to suggest a user what type of clothes to wear based on the weather conditions. Hence, the ER diagram is built in such a way that it responds to the data structure that suits the different processes of registering a user, requesting weather information, giving suggestions based on the weather details, and expecting feedback from the user. Additionally, for the application maintenance purpose, certains actions such as the API requests are logged into the database.
+
+
+ER diagram for WeatherDress
+---
+
+Tools and Software used to come up the end-results:
+- MySQL Workbench (v6.3)
+	Define UML diagram (model) for MySQL Engine v5.7
+	Generate the logical database schema
+- Lucid Chart (web service)
+	Define the ER diagram
+
+---
+Database name: weather-dress
+
+Entities:
+- users: Records of user details at the time of signing up one user to the web service. Future operations like update or soft delete are also possible. No default values are specified yet.
+
+- clothes: Records of clothes for different genders (including age). Note that the word 'clothes' has been treated as both in singular and plural form to deal with naming convention. Therefore, a foreign key referencing the table 'clothes' will be 'id_clothes', unlike the others that are expressed in a singular form (i,e. id_user).
+
+- clothes_settings: Records of sets of clothes regarding the weather conditions.
+
+- weather_conditions: Records of predefined weather conditions to determine weather protection. Many parameters are taken into account to model the weight factor of the decision-making ( clothes suggestions).
+
+- feedbacks: Records of a mechanism of reinforcement learning, provided by the users. The 'feedback' doesn't have a plural in English. However, to upkeep the standardization between table names, the name 'feedbacks' is used.
+
+- logs: Records of logs for the entire web service: user interactions, API requests, etc.
+
+
+

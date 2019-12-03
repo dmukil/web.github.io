@@ -1,0 +1,54 @@
+\documentclass[]{article}
+\usepackage{pdfpages}
+
+\usepackage[inner=3.5cm,outer=3.5cm,top=3.0cm,bottom=3.0cm]{geometry}
+
+%opening
+\title{Big Databases \& Cloud Services Assignment 2}
+\author{Diogo Cosin Ayres de Oliveira, Feven Legesse Mammo,\\ Gari Ciodaro Guerra, Mukilarasan Deivamani, Ralph Florent\\ \textbf{Team Unicum}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Recalling that our most recent work, the project prospectus for the Web Service \textit{Weather Dress}, discussed the general functionality and the scope of such a service, this assignment pursues with the development of the database module by designing the Entity Relation(ER) diagram and defining the Logical Database Schema. 
+\end{abstract}
+
+
+\section{Introduction}
+As specified in the previous work, the main idea of `Weather Dress` is to suggest a user what type of clothes to wear based on the weather conditions. Hence, the ER diagram is built in such a way that it responds to the data structure that suits the different processes of registering a user, requesting weather information, giving suggestions based on the weather details, and expecting feedback from the user. Additionally, for the application maintenance purpose, certains actions such as the API requests are logged into the database.
+
+\section{ER diagram for WeatherDress}
+
+\subsection{Tools}
+Tools and Software used to come up the end-results:\\
+
+MySQL Workbench (v6.3)
+\begin{itemize}
+	\item Define UML diagram (model) for MySQL Engine v5.7.
+	\item Generate the logical database schema.
+\end{itemize}
+
+Lucid Chart (web service)
+\begin{itemize}
+	\item Define the ER diagram.
+\end{itemize}
+
+\subsection{Database name: weather-dress}
+
+Entities:
+\begin{itemize}
+	\item \textbf{users:} Records of user details at the time of signing up one user to the web service. Future operations like update or soft delete are also possible. No default values are specified yet.
+	\item \textbf{clothes:} Records of clothes for different genders (including age). Note that the word 'clothes' has been treated as both in singular and plural form to deal with naming convention. Therefore, a foreign key referencing the table 'clothes' will be 'id\_clothes', unlike the others that are expressed in a singular form (i,e. id\_user).
+	\item \textbf{clothes\_settings:} Records of sets of clothes regarding the weather conditions.
+	\item \textbf{weather\_conditions:} Records of predefined weather conditions to determine weather protection. Many parameters are taken into account to model the weight factor of the decision-making (clothes suggestions).
+	\item \textbf{feedbacks:} Records of a mechanism of reinforcement learning, provided by the users. The 'feedback' doesn't have a plural in English. However, to upkeep the standardization between table names, the name 'feedbacks' is used.
+	\item \textbf{logs:} Records of logs for the entire web service: user interactions, API requests, etc.
+\end{itemize}
+
+
+
+
+
+\end{document}

@@ -1,0 +1,328 @@
+\documentclass[]{article}
+\usepackage{pdfpages}
+
+\usepackage[inner=3.5cm,outer=3.5cm,top=3.0cm,bottom=3.0cm]{geometry}
+
+%opening
+\title{Big Databases \& Cloud Services Assignment 3}
+\author{Diogo Cosin Ayres de Oliveira, Feven Legesse Mammo,\\ Gari Ciodaro Guerra, Mukilarasan Deivamani, Ralph Florent\\ \textbf{Team Unicum}}
+
+\begin{document}
+
+\maketitle
+
+%\begin{abstract}
+%Recalling that our most recent work, the project prospectus for the Web Service \textit{Weather Dress}, discussed the general functionality and the scope of such a %service, this assignment pursues with the development of the database module by designing the Entity Relation(ER) diagram and defining the Logical Database Schema. 
+%\end{abstract}
+
+
+\section{Queries}
+
+\textbf{We want to know how many active customers we have in our database.}
+\begin{verbatim}
+mysql> select count(*) as active_count  from persons where active=1;
++--------------+
+| active_count |
++--------------+
+|          229 |
++--------------+
+1 row in set (0,01 sec)
+\end{verbatim}
+
+
+
+\textbf{We want to know the distribution by gender of the all our clients in history.}
+\begin{verbatim}
+mysql> select count(*) as gender_count  from persons group by gender;
++--------------+
+| gender_count |
++--------------+
+|          245 |
+|          256 |
++--------------+
+2 rows in set (0,00 sec)
+\end{verbatim}
+
+\textbf{We want to know how many woman are active customers.}
+\begin{verbatim}
+mysql> select count(*) as active_F,active  from persons where gender='F' 
+group by active;
++----------+--------+
+| active_F | active |
++----------+--------+
+|      135 |      0 |
+|      110 |      1 |
++----------+--------+
+2 rows in set (0,01 sec)
+\end{verbatim}
+
+
+
+\textbf{We want to know how many active clients have custom clothes.}
+\begin{verbatim}
+mysql> select count(*) as user_custom_conf from persons a 
+left join clothes b  
+on a.id=b.id_user where b.category='CUSTOM' and a.active=1;
++------------------+
+| user_custom_conf |
++------------------+
+|               30 |
++------------------+
+1 row in set (0,01 sec)
+\end{verbatim}
+
+\textbf{We want to know the average weather sensibility per gender group of people who have Custom clothes}
+\begin{verbatim}
+mysql> select avg(weather_sensibility) as avg ,a.gender from persons a 
+left join clothes b  
+on a.id=b.id_user where b.category='CUSTOM' group by a.gender;
++--------+--------+
+| avg    | gender |
++--------+--------+
+| 1.3889 | F      |
+| 0.5676 | M      |
++--------+--------+
+2 rows in set (0,00 sec)
+\end{verbatim}
+
+
+\textbf{We want to know the average age of inactive customers who had custom category clothes per gender group}
+\begin{verbatim}
+mysql> select avg(YEAR(CURDATE()) - YEAR(birthdate))  as avg_age,a.gender 
+from persons a left join clothes b  on a.id=b.id_user where b.category='CUSTOM' 
+and a.active=0 group by a.gender;
++---------+--------+
+| avg_age | gender |
++---------+--------+
+| 32.1818 | F      |
+| 32.8571 | M      |
++---------+--------+
+2 rows in set (0,00 sec)
+\end{verbatim}
+
+
+\textbf{We want the users with most number of feedback.}
+\begin{verbatim}
+SELECT p.id, p.username, COUNT(*) as count FROM persons p
+	INNER JOIN feedbacks f
+		ON p.id = f.id_user
+        GROUP BY p.id
+        ORDER BY count DESC
+        LIMIT 5;
+
+We get the following result with this query.
+
+id, username, count
+'55','sjosskovitz1i','6'
+'149','blambden44','5'
+'54','lheiton1h','5'
+'8','hreynoollds7','5'
+'194','bjerisch5d','5'
+\end{verbatim}
+
+\textbf{We want to select the users that have not provided any feedback so far. We limit the number of rows returned to five to keep this report in manageable length.} 
+
+\begin{verbatim}
+SELECT p.id, p.first_name, p.last_name, p.username, f.id_user FROM persons p
+	LEFT JOIN feedbacks f
+		ON p.id = f.id_user
+        HAVING f.id_user IS NULL
+        LIMIT 5;
+
+We get the following result with this query.
+
+id, first_name, last_name, id_user 
+'3','Spenser','Netley','snetley2',NULL
+'16','Alejoa','Fenby','afenbyf',NULL
+'20','Papageno','Tollet','ptolletj',NULL
+'27','Jemimah','Blann','jblannq',NULL
+'33','Samara','Roslen','sroslenw',NULL
+\end{verbatim}
+
+\textbf{We want now the users that have already provided at least one feedback. We limit the number of rows returned to five to keep this report in manageable length.} 
+
+\begin{verbatim}
+SELECT DISTINCT p.id, p.first_name, p.last_name, p.username, f.id_user FROM persons p
+	INNER JOIN feedbacks f
+		ON p.id = f.id_user
+        LIMIT 5;
+
+We get the following result with this query.
+
+id, first_name, last_name, id_user 
+'1','Noel','Paslow','npaslow0','1'
+'2','Ermengarde','Stonary','estonary1','2'
+'4','Hatti','Pentin','hpentin3','4'
+'5','Mignonne','Nuzzetti','mnuzzetti4','5'
+'6','Concordia','Wadmore','cwadmore5','6'
+\end{verbatim}
+
+\textbf{To what weather conditions (mainly temperature) people needs more protection?}
+
+\begin{verbatim}
+SELECT
+	  wc.temp 		AS Temperature
+	, wc.temp_min 	AS MIN
+	, wc.temp_max 	AS MAX
+	, wc.feels_like AS Sensation
+	, wc.weather_protection AS Protection
+
+FROM 
+	`weather_conditions` AS wc
+WHERE
+	wc.weather_protection > 5.00
+LIMIT 10
+;
+
+Temperature, MIN, MAX, Sensation, Protection
+'-99.7','-105.1','-91.8','-102.1','7.7'
+'-50.1','-54.7','-49.7','-54.5','9.54'
+'83.2','80.4','92.9','88.1','7.15'
+'85','79.7','90','80.6','8.18'
+'-60.9','-64.6','-51','-64.3','6.86'
+'47.1','44.5','54.2','43.2','5.43'
+'-48.8','-55.7','-47.1','-51','8.34'
+'-28.3','-31.9','-28.1','-29.3','7.64'
+'9.8','3.7','10.6','10.3','6.29'
+'-1.8','-6.8','6','-6.5','8.67'
+
+\end{verbatim}
+
+\textbf{What weather conditions are considered extremely dangerous for the human beings?}
+
+\begin{verbatim}
+SELECT
+	  wc.temp 		AS Temperature
+	, wc.temp_min 	AS MIN
+	, wc.temp_max 	AS MAX
+	, wc.feels_like AS Sensation
+	, wc.weather_protection AS Protection
+
+FROM 
+	`weather_conditions` AS wc
+WHERE
+	wc.weather_protection >= 7.5 AND
+	wc.weather_protection <= 10.0
+LIMIT 10
+;
+
+We get the following results.
+
+Temperature, MIN, MAX, Sensation, Protection
+'-99.7','-105.1','-91.8','-102.1','7.7'
+'-50.1','-54.7','-49.7','-54.5','9.54'
+'85','79.7','90','80.6','8.18'
+'-48.8','-55.7','-47.1','-51','8.34'
+'-28.3','-31.9','-28.1','-29.3','7.64'
+'-1.8','-6.8','6','-6.5','8.67'
+'-90','-98.2','-88.3','-85.8','8.72'
+'12.5','9.4','21.1','13.7','7.6'
+'-89.3','-90.9','-87.2','-85.2','9.21'
+'76.2','70.3','85.7','78.1','7.95'
+
+\end{verbatim}
+
+
+\textbf{We want to know how many people over 18 we have.}
+
+\begin{verbatim}
+
+mysql> select count(*) from persons  where YEAR(CURDATE()) - YEAR(birthdate)>18;
+
++----------+
+
+| count(*) |
+
++----------+
+
+|      356 |
+
++----------+
+
+1 row in set (0,00 sec)
+
+\end{verbatim}
+
+
+\textbf{We want to know how many users have weak passwords}
+
+\begin{verbatim}
+
+mysql> select count(*) from persons where length(password)<10;
+
++----------+
+
+| count(*) |
+
++----------+
+
+|      288 |
+
++----------+
+
+1 row in set (0,01 sec)
+
+\end{verbatim}
+
+
+
+\textbf{We want to know if there is some possibility that members of the same family are using the application.}
+
+\begin{verbatim}
+
+mysql> select  count(id),last_name from persons group by last_name having count(last_name)>1;
+
++-----------+-----------+
+
+| count(id) | last_name |
+
++-----------+-----------+
+
+|         2 | Baptie    |
+
+|         2 | Escot     |
+
+|         2 | McGaughay |
+
+|         2 | Tiptaft   |
+
++-----------+-----------+
+
+4 rows in set (0,00 sec)
+
+\end{verbatim}
+
+
+\textbf{We want to check whether we user with the same email}
+
+\begin{verbatim}
+
+mysql> select  count(id),email from persons group by email having count(email)>1;
+
+Empty set (0,00 sec)
+
+\end{verbatim}
+
+
+
+\section{Data base}
+
+\begin{verbatim}
+mysql> show tables;
++-----------------------------------+
+| Tables_in_weather-dress           |
++-----------------------------------+
+| clothes                           |
+| clothes_settings                  |
+| clothes_settings_refer_to_clothes |
+| feedbacks                         |
+| logs                              |
+| persons                           |
+| weather_conditions                |
++-----------------------------------+
+7 rows in set (0,00 sec)
+\end{verbatim}
+
+
+
+\end{document}
